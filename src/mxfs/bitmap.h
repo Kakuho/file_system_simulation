@@ -25,7 +25,7 @@ RSTATUS mx_bitmap_register_inodemap(mx_bitmap* inodebitmap, mx_superblock* super
 RSTATUS mx_bitmap_register_blockmap(mx_bitmap* blockmap, mx_superblock* superblock);
 
 void mx_inode_bitmap_allocate(ramdisk* disk);
-void mx_inode_bitmap_deallocate(int64_t index);
+void mx_inode_bitmap_deallocate(ramdisk* disk, int64_t index);
 
 void mx_block_bitmap_allocate(mx_superblock* superblock);
 void mx_block_bitmap_deallocate(mx_superblock* superblock);

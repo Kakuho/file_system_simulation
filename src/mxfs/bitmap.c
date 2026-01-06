@@ -92,12 +92,14 @@ int64_t mx_inode_get_free_index(char* inode_block, mx_superblock* superblock){
 }
 
 int64_t mx_inode_set(ramdisk* disk, mx_superblock* superblock, uint64_t index){
-  // given the inode index, set it to 1
-  // mapping of indexes to blocks:
-//  byte 0: 00 01 02 03 04 05 06 07
-  //  byte 1: 08 09 10 11 12 13 14 15
-  //  ...
-  //  byte i: i*8 i*8+1 i*8+2 i*8+3 i*8+4 i*8+5 i*8+6 i*8+7
+  //  given the inode index, set it to 1
+  //  mapping of indexes to blocks:
+  //    byte 0: 00 01 02 03 04 05 06 07
+  //    byte 1: 08 09 10 11 12 13 14 15
+  //    ...
+  //    byte i: i*8 i*8+1 i*8+2 i*8+3 i*8+4 i*8+5 i*8+6 i*8+7
+  //
+  //  consumer grade
   char buffer[MX_BLOCKSIZE];
   ramdisk_read(disk, buffer, superblock->inode_bitmap_base);
   uint32_t byteno = index / 8;
@@ -136,4 +138,13 @@ void mx_inode_bitmap_allocate(ramdisk* disk){
   ramdisk_write(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
 }
 
-
+void mx_inode_bitmap_deallocate(ramdisk* disk, int64_t index){
+  // first read the superblock into ram 
+  char sb_buffer[MX_BLOCKSIZE];
+  ramdisk_read(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
+  mx_superblock* superblock = (mx_superblock*)sb_buffer;
+  mx_inode_clear(disk, superblock, index);
+  // finally update the super block
+  superblock->ninodes = superblock->ninodes+1;
+  ramdisk_write(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
+}
