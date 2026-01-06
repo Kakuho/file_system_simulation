@@ -30,7 +30,6 @@ size_t mx_bitmap_nblocks(mx_bitmap* bitmap){
   }
   size_t bytes = bitmap->length / 8;
   return bytes/MX_BLOCKSIZE;
-
 }
 
 RSTATUS mx_bitmap_register_inodemap(mx_bitmap* inodebitmap, mx_superblock* superblock){
@@ -65,6 +64,15 @@ size_t mx_inode_bitmap_nblocks(mx_superblock* superblock){
   return bytes/MX_BLOCKSIZE;
 }
 
+void mx_inode_index_to_byte_offset(
+  uint64_t inode_index, 
+  uint32_t* byte_index, 
+  uint8_t* offset
+){
+  *byte_index = inode_index / 8;
+  *offset = inode_index - ((inode_index/8) * 8);
+}
+
 int64_t mx_inode_get_free_index(char* inode_block, mx_superblock* superblock){
   // we know a block is 1024 bytes long, therefore the bitmap is 1024*8 bits long
   // remember 0 as free and 1 as busy
@@ -86,7 +94,7 @@ int64_t mx_inode_get_free_index(char* inode_block, mx_superblock* superblock){
 int64_t mx_inode_set(ramdisk* disk, mx_superblock* superblock, uint64_t index){
   // given the inode index, set it to 1
   // mapping of indexes to blocks:
-  //  byte 0: 00 01 02 03 04 05 06 07
+//  byte 0: 00 01 02 03 04 05 06 07
   //  byte 1: 08 09 10 11 12 13 14 15
   //  ...
   //  byte i: i*8 i*8+1 i*8+2 i*8+3 i*8+4 i*8+5 i*8+6 i*8+7
@@ -127,3 +135,5 @@ void mx_inode_bitmap_allocate(ramdisk* disk){
   superblock->ninodes = superblock->ninodes-1;
   ramdisk_write(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
 }
+
+
