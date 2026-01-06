@@ -46,8 +46,34 @@ void ramdisk_print(ramdisk* disk){
       printf("\n\nBlock %d:\n", i/disk->blocksize);
     }
     printf("%d ", disk->base[i]);
+    if(i != 0 && (i+1) % 64 == 0){
+      printf("\n");
+    }
   }
   printf("\n");
+}
+
+void ramdisk_dump(ramdisk* disk, const char* file_path){
+  FILE* file = fopen(file_path, "w");
+  if(file == NULL){
+    return;
+  }
+  fprintf(file, "max index: %d\n", disk->nblocks * disk->blocksize);
+  int i;
+  for(i = 0; i < (disk->nblocks * disk->blocksize); i++){
+    if(i == 0){
+      fprintf(file, "Block %d:\n", i/disk->blocksize);
+    }
+    else if(i % disk->blocksize == 0){
+      fprintf(file, "\n\nBlock %d:\n", i/disk->blocksize);
+    }
+    fprintf(file, "%d ", disk->base[i]);
+    if(i != 0 && (i+1) % 64 == 0){
+      fprintf(file, "\n");
+    }
+
+  }
+  fprintf(file, "\n");
 }
 
 void ramdisk_print_properties(ramdisk* disk){
