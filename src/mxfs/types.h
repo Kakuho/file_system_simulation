@@ -3,25 +3,34 @@
 
 #define MX_BLOCKSIZE 1024
 
+#define MX_INODE_INDIRECT_ENTRIES 9    // 7 single, 1 double, 1 triple
+#define MX_INODE_DOUBLE_INDIRECT 7
+#define MX_INODE_TRIPLE_INDIRECT 8
+
+#include <stdint.h>
+#include <stddef.h>
+
+//  The organisation of the file system:
+//  block_1     | block_2            | block_3 ... block_m            | block_m           | block_m+1 ... block_n
+//  superblock  | inodebitmap block    blocks consisting of inodes      datablock bitmap    blocks for data blocks
+
 typedef struct mx_superblock{
-  unsigned short s_ninodes;
-  unsigned short s_nzones;
-  unsigned short s_imap_blocks;
-  unsigned short s_zmap_blocks;
-  unsigned short s_firstdatazone;
-  unsigned short s_log_zone_size;
-  unsigned long s_max_size;
-  unsigned short s_magic;
+  uint16_t ninodes;             // 65535 file inodes, plenty
+  uint16_t inode_bitmap_base;
+  uint16_t inode_base; 
+  uint16_t nblocks;             // data blocks
+  uint16_t block_bitmap_base;
+  uint16_t block_base;
 } mx_superblock;
 
 typedef struct mx_disk_inode{
-  unsigned short i_mode;
-  unsigned short i_uid;
-  unsigned long  i_size;
-  unsigned long  i_time;
-  unsigned char  i_gid;
-  unsigned char  i_nlinks;
-  unsigned short i_zone[7+1+1];
+  uint16_t mode;
+  size_t size;
+  uintptr_t blocks[MX_INODE_INDIRECT_ENTRIES];
 } mx_disk_inode;
+
+typedef struct mx_data_block{
+  uint8_t data[MX_BLOCKSIZE];
+} mx_data_block;
 
 #endif
