@@ -7,8 +7,8 @@
 #define MX_INODE_DOUBLE_INDIRECT 7
 #define MX_INODE_TRIPLE_INDIRECT 8
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 //  The organisation of the file system:
 //  block_1     | block_2            | block_3 ... block_m            | block_m           | block_m+1 ... block_n
@@ -29,8 +29,12 @@ typedef struct mx_disk_inode{
   uintptr_t blocks[MX_INODE_INDIRECT_ENTRIES];
 } mx_disk_inode;
 
+
 typedef struct mx_data_block{
   uint8_t data[MX_BLOCKSIZE];
 } mx_data_block;
+
+// should be a compile time function / constant
+inline unsigned mx_inodes_per_block(){ return MX_BLOCKSIZE/sizeof(mx_disk_inode); }
 
 #endif
