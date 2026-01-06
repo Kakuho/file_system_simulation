@@ -7,6 +7,8 @@
 #define MX_INODE_DOUBLE_INDIRECT 7
 #define MX_INODE_TRIPLE_INDIRECT 8
 
+#define MX_SUPERBLOCK_INDEX 1
+
 #include <stddef.h>
 #include <stdint.h>
 

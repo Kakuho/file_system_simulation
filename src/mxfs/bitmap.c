@@ -73,28 +73,57 @@ int64_t mx_inode_get_free_index(char* inode_block, mx_superblock* superblock){
   for(i = 0; i < mx_inode_bitmap_nblocks(superblock); i++){
     uint8_t present_mask = ~(inode_block[i] & mask);  // 0 for busy 1 for free
     if(present_mask > 0){
-      int bitpos = 0;  // counting from the right most of the present_mask
+      int bitpos = 0;  // counting from the right-most bits of the present_mask
       while(!(present_mask >> bitpos & 0x01)){
         bitpos++;
       }
-      return i*8 + bitpos;
+      return i*8 + (7 - bitpos);
     }
   }
   return -1;
 }
 
-void mx_inode_bitmap_allocate(ramdisk* disk, mx_superblock* superblock){
-  // first find a free index from the bitmap
-  uint16_t bitmap_base = superblock->inode_bitmap_base;
-  size_t inodeblocks = mx_inode_bitmap_nblocks(superblock);
-  uint64_t index = 0;
-  while(index < inodeblocks){
-    // check if disk block i has a free entry
-    char buffer[MX_BLOCKSIZE];
-    ramdisk_read(disk, buffer, index);
-    int i = mx_inode_get_free_index(buffer, superblock);
-    index++;
-  }
+int64_t mx_inode_set(ramdisk* disk, mx_superblock* superblock, uint64_t index){
+  // given the inode index, set it to 1
+  // mapping of indexes to blocks:
+  //  byte 0: 00 01 02 03 04 05 06 07
+  //  byte 1: 08 09 10 11 12 13 14 15
+  //  ...
+  //  byte i: i*8 i*8+1 i*8+2 i*8+3 i*8+4 i*8+5 i*8+6 i*8+7
+  char buffer[MX_BLOCKSIZE];
+  ramdisk_read(disk, buffer, superblock->inode_bitmap_base);
+  uint32_t byteno = index / 8;
+  uint8_t offset = index - ((index/8) * 8); // probably a better way to do this
+  // our index is at offset of the byte byteno
+  buffer[byteno] |= 1 << (7 - offset);
+  ramdisk_write(disk, buffer, superblock->inode_bitmap_base);
+  return 0;
+}
 
-  // update the super block?
+int64_t mx_inode_clear(ramdisk* disk, mx_superblock* superblock, uint64_t index){
+  // given the inode index, clear it to 0
+  // see mx_inode_set
+  char buffer[MX_BLOCKSIZE];
+  ramdisk_read(disk, buffer, superblock->inode_bitmap_base);
+  uint32_t byteno = index / 8;
+  uint8_t offset = index - ((index/8) * 8); // probably a better way to do this
+  // our index is at offset of the byte byteno
+  buffer[byteno] &= 0 << (7 - offset);
+  ramdisk_write(disk, buffer, superblock->inode_bitmap_base);
+  return 0;
+}
+
+void mx_inode_bitmap_allocate(ramdisk* disk){
+  // first read the superblock into ram 
+  char sb_buffer[MX_BLOCKSIZE];
+  ramdisk_read(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
+  mx_superblock* superblock = (mx_superblock*)sb_buffer;
+  // then find a free index from the bitmap and set it
+  char buffer[MX_BLOCKSIZE];
+  ramdisk_read(disk, buffer, superblock->inode_bitmap_base);
+  int64_t index = mx_inode_get_free_index(buffer, superblock);
+  mx_inode_set(disk, superblock, index);
+  // finally update the super block
+  superblock->ninodes = superblock->ninodes-1;
+  ramdisk_write(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
 }
