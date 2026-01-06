@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/ka/C/scratch/open_simul/build",
+  "command": "/usr/bin/cc  -I/home/ka/C/scratch/open_simul/src -g -std=gnu90 -o CMakeFiles/file_system_simulation.dir/src/main.c.o -c /home/ka/C/scratch/open_simul/src/main.c",
+  "file": "/home/ka/C/scratch/open_simul/src/main.c"
+}
+]
