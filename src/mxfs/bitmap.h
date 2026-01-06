@@ -19,8 +19,10 @@ typedef struct mx_bitmap{
 
 RSTATUS mx_bitmap_init(mx_bitmap* bitmap, ramdisk* disk, uint16_t base, uint64_t length);
 
-void mx_bitmap_register_inodemap(mx_bitmap* inodebitmap, mx_superblock* superblock);
-void mx_bitmap_register_blockmap(mx_bitmap* inodebitmap, mx_superblock* superblock);
+size_t mx_bitmap_nblocks(mx_bitmap* bitmap);
+
+RSTATUS mx_bitmap_register_inodemap(mx_bitmap* inodebitmap, mx_superblock* superblock);
+RSTATUS mx_bitmap_register_blockmap(mx_bitmap* blockmap, mx_superblock* superblock);
 
 void mx_inode_bitmap_allocate(mx_superblock* superblock);
 void mx_inode_bitmap_deallocate(mx_superblock* superblock);
