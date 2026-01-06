@@ -1,4 +1,5 @@
 build/*
 main
 *.swp
-
+compile_commands.json
+.cache
