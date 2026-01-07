@@ -38,6 +38,7 @@ RSTATUS mx_bitmap_register_inodemap(mx_bitmap* inodebitmap, mx_superblock* super
   }
   superblock->ninodes = inodebitmap->length;
   superblock->inode_bitmap_base = inodebitmap->base;
+  superblock->inodes_used = 0;
   // bitmap_base_index + bitmap_blocks
   size_t blocks = mx_bitmap_nblocks(inodebitmap);
   superblock->inode_base = inodebitmap->base + blocks;
@@ -78,11 +79,11 @@ int64_t mx_inode_get_free_index(char* inode_block, mx_superblock* superblock){
   // remember 0 as free and 1 as busy
   uint8_t mask = 0xFF;
   int i;
-  for(i = 0; i < mx_inode_bitmap_nblocks(superblock); i++){
+  for(i = 0; i < superblock->ninodes; i++){
     uint8_t present_mask = ~(inode_block[i] & mask);  // 0 for busy 1 for free
     if(present_mask > 0){
       int bitpos = 0;  // counting from the right-most bits of the present_mask
-      while(!(present_mask >> bitpos & 0x01)){
+      while(!((present_mask >> bitpos) & 0x01)){
         bitpos++;
       }
       return i*8 + (7 - bitpos);
@@ -105,7 +106,9 @@ int64_t mx_inode_set(ramdisk* disk, mx_superblock* superblock, uint64_t index){
   uint32_t byteno = index / 8;
   uint8_t offset = index - ((index/8) * 8); // probably a better way to do this
   // our index is at offset of the byte byteno
-  buffer[byteno] |= 1 << (7 - offset);
+  printf("byte index: %d\n", byteno);
+  printf("offset: %d\n", offset);
+  buffer[byteno] = buffer[byteno] | (1 << (7 - offset));
   ramdisk_write(disk, buffer, superblock->inode_bitmap_base);
   return 0;
 }
@@ -132,9 +135,9 @@ void mx_inode_bitmap_allocate(ramdisk* disk){
   char buffer[MX_BLOCKSIZE];
   ramdisk_read(disk, buffer, superblock->inode_bitmap_base);
   int64_t index = mx_inode_get_free_index(buffer, superblock);
-  mx_inode_set(disk, superblock, index);
+  mx_inode_set(disk, superblock, index);  // giving me a sig fault
   // finally update the super block
-  superblock->ninodes = superblock->ninodes-1;
+  superblock->inodes_used = superblock->inodes_used+1;
   ramdisk_write(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
 }
 
@@ -145,6 +148,6 @@ void mx_inode_bitmap_deallocate(ramdisk* disk, int64_t index){
   mx_superblock* superblock = (mx_superblock*)sb_buffer;
   mx_inode_clear(disk, superblock, index);
   // finally update the super block
-  superblock->ninodes = superblock->ninodes+1;
+  superblock->inodes_used = superblock->inodes_used-1;
   ramdisk_write(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
 }

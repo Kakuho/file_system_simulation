@@ -18,6 +18,7 @@
 
 typedef struct mx_superblock{
   uint16_t ninodes;             // 65535 file inodes, plenty
+  uint16_t inodes_used;
   uint16_t inode_bitmap_base;
   uint16_t inode_base; 
   uint16_t nblocks;             // data blocks
@@ -30,7 +31,6 @@ typedef struct mx_disk_inode{
   size_t size;
   uintptr_t blocks[MX_INODE_INDIRECT_ENTRIES];
 } mx_disk_inode;
-
 
 typedef struct mx_data_block{
   uint8_t data[MX_BLOCKSIZE];

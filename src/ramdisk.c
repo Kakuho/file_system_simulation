@@ -16,6 +16,7 @@ ramdisk* ramdisk_create(unsigned nblocks, unsigned blocksize){
   return disk;
 }
 
+
 void ramdisk_destroy(ramdisk* disk){
   free(disk->base);
   free(disk);
@@ -31,7 +32,7 @@ void ramdisk_print(ramdisk* disk){
     else if(i % disk->blocksize == 0){
       printf("\n\nBlock %d:\n", i/disk->blocksize);
     }
-    printf("%d ", disk->base[i]);
+    printf("%x ", disk->base[i] & 0xFF);
     if(i != 0 && (i+1) % 64 == 0){
       printf("\n");
     }
@@ -53,7 +54,7 @@ void ramdisk_dump(ramdisk* disk, const char* file_path){
     else if(i % disk->blocksize == 0){
       fprintf(file, "\n\nBlock %d:\n", i/disk->blocksize);
     }
-    fprintf(file, "%d ", disk->base[i]);
+    fprintf(file, "%x ", disk->base[i] & 0xFF);
     if(i != 0 && (i+1) % 64 == 0){
       fprintf(file, "\n");
     }
