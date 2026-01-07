@@ -18,6 +18,7 @@ ramdisk* ramdisk_create(unsigned nblocks, unsigned blocksize);
 void ramdisk_destroy(ramdisk* disk);
 
 void ramdisk_print(ramdisk* disk);
+void ramdisk_print_block(ramdisk* disk, unsigned block);
 void ramdisk_dump(ramdisk* disk, const char* file_path);
 void ramdisk_print_properties(ramdisk* disk);
 

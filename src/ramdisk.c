@@ -40,6 +40,20 @@ void ramdisk_print(ramdisk* disk){
   printf("\n");
 }
 
+void ramdisk_print_block(ramdisk* disk, unsigned block){
+  int i;
+  for(i = 0; i < disk->blocksize; i++){
+    if(i == 0){
+      printf("Block %d:\n", block);
+    }
+    printf("%x ", disk->base[(disk->blocksize * block) + i] & 0xFF);
+    if(i != 0 && (i+1) % 64 == 0){
+      printf("\n");
+    }
+  }
+  printf("\n");
+}
+
 void ramdisk_dump(ramdisk* disk, const char* file_path){
   FILE* file = fopen(file_path, "w");
   if(file == NULL){
