@@ -31,6 +31,9 @@ void mxfs_flush_superblock(ramdisk* disk, mx_superblock* superblock){
   }
 }
 
-RSTATUS mxfs_get_superblock(mx_superblock* buffer){
-
+RSTATUS mxfs_read_superblock(ramdisk* disk, char* buffer){
+  if(ramdisk_read(disk, buffer, MX_SUPERBLOCK_INDEX) != 0){
+    return -1;
+  }
+  return 0;
 }

@@ -8,6 +8,6 @@
 void mxfs_init(ramdisk* disk, size_t ninodes, size_t nblocks);
 void mxfs_flush_superblock(ramdisk* disk, mx_superblock* superblock);
 
-RSTATUS mxfs_get_superblock(mx_superblock* buffer);
+RSTATUS mxfs_read_superblock(ramdisk* disk, char* buffer);
 
 #endif
