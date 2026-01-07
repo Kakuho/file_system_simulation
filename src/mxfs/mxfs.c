@@ -23,12 +23,29 @@ void mxfs_init(ramdisk* disk, size_t ninodes, size_t nblocks){
   free(superblock);
 }
 
-void mxfs_flush_superblock(ramdisk* disk, mx_superblock* superblock){
+RSTATUS mxfs_flush_superblock(mxfs* mxfs, ramdisk* disk){
   char buffer[MX_BLOCKSIZE];
-  memcpy(buffer, superblock, MX_BLOCKSIZE);
+  memcpy(buffer, &mxfs->superblock, MX_BLOCKSIZE);
   if(ramdisk_write(disk, buffer, MX_SUPERBLOCK_INDEX) != 0){
-    return;
+    return -1;
   }
+  return 0;
+}
+
+RSTATUS mxfs_refersh_superblock(mxfs* mxfs, ramdisk* disk){
+  char buffer[MX_BLOCKSIZE];
+  if(ramdisk_read(disk, buffer, MX_SUPERBLOCK_INDEX) != 0){
+    return -1;
+  }
+  memcpy(&mxfs->superblock, buffer, MX_BLOCKSIZE);
+  return 0;
+}
+
+RSTATUS mxfs_write_superblock(ramdisk* disk, char* buffer){
+  if(ramdisk_write(disk, buffer, MX_SUPERBLOCK_INDEX) != 0){
+    return -1;
+  }
+  return 0;
 }
 
 RSTATUS mxfs_read_superblock(ramdisk* disk, char* buffer){
