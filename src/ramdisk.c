@@ -13,9 +13,9 @@ ramdisk* ramdisk_create(unsigned nblocks, unsigned blocksize){
   disk->base = buffer;
   disk->nblocks = nblocks;
   disk->blocksize = blocksize;
+  memset(disk->base, 0, disk->nblocks * disk->blocksize);
   return disk;
 }
-
 
 void ramdisk_destroy(ramdisk* disk){
   free(disk->base);
