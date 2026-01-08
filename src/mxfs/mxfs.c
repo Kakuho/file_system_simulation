@@ -1,19 +1,12 @@
 #include "mxfs.h"
-#include "types.h"
-#include "bitmap.h"
+#include "inode_bitmap.h"
 
 void mxfs_setup_inodes_dblocks(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t nblocks){
   if(mxfs == NULL || disk == NULL){
     // ABORT!!!
     return;
   }
-  // initialise the ninodes
-  mx_bitmap inodebitmap;
-  if(mx_bitmap_init(&inodebitmap, disk, MX_SUPERBLOCK_INDEX + 1, ninodes) != 0){
-    // ABORT!!
-    return;
-  }
-  if(mx_bitmap_register_inodemap(&inodebitmap, &mxfs->superblock) != 0){
+  if(mxfs_inode_bitmap_init(mxfs, disk, MX_SUPERBLOCK_INDEX+1, ninodes) != 0){
     // ABORT!!
     return;
   }
@@ -39,7 +32,7 @@ RSTATUS mxfs_flush_superblock(mxfs* mxfs, ramdisk* disk){
   return 0;
 }
 
-RSTATUS mxfs_refersh_superblock(mxfs* mxfs, ramdisk* disk){
+RSTATUS mxfs_refresh_superblock(mxfs* mxfs, ramdisk* disk){
   char buffer[MX_BLOCKSIZE];
   if(ramdisk_read(disk, buffer, MX_SUPERBLOCK_INDEX) != 0){
     return -1;
