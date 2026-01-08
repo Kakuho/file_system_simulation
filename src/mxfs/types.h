@@ -22,6 +22,7 @@ typedef struct mx_superblock{
   uint16_t inode_bitmap_base;
   uint16_t inode_base; 
   uint16_t nblocks;             // data blocks
+  uint16_t blocks_used;
   uint16_t block_bitmap_base;
   uint16_t block_base;
 } mx_superblock;
