@@ -11,7 +11,7 @@ typedef struct mxfs{
   mx_superblock superblock;
 } mxfs;
 
-void mxfs_init(ramdisk* disk, size_t ninodes, size_t nblocks);
+void mxfs_init(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t nblocks);
 
 RSTATUS mxfs_flush_superblock(mxfs* mxfs, ramdisk* disk);
 RSTATUS mxfs_refresh_superblock(mxfs* mxfs, ramdisk* disk);

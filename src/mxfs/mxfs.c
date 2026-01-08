@@ -2,9 +2,8 @@
 #include "types.h"
 #include "bitmap.h"
 
-void mxfs_init(ramdisk* disk, size_t ninodes, size_t nblocks){
-  mx_superblock* superblock = (mx_superblock*)malloc(sizeof(mx_superblock));
-  if(superblock == NULL){
+void mxfs_setup_inodes_dblocks(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t nblocks){
+  if(mxfs == NULL || disk == NULL){
     // ABORT!!!
     return;
   }
@@ -14,18 +13,26 @@ void mxfs_init(ramdisk* disk, size_t ninodes, size_t nblocks){
     // ABORT!!
     return;
   }
-  if(mx_bitmap_register_inodemap(&inodebitmap, superblock) != 0){
+  if(mx_bitmap_register_inodemap(&inodebitmap, &mxfs->superblock) != 0){
     // ABORT!!
     return;
   }
-  // initialise the blocks
-  mxfs_flush_superblock(disk, superblock);
-  free(superblock);
+}
+
+void mxfs_init(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t nblocks){
+  memset(&mxfs->superblock, 0, sizeof(mxfs->superblock));
+  mxfs_setup_inodes_dblocks(mxfs, disk, ninodes, nblocks);
+  // mxfs_setup_blocks
+  if(mxfs_flush_superblock(mxfs, disk) != 0){
+    // ABORT!!
+    return;
+  }
 }
 
 RSTATUS mxfs_flush_superblock(mxfs* mxfs, ramdisk* disk){
   char buffer[MX_BLOCKSIZE];
-  memcpy(buffer, &mxfs->superblock, MX_BLOCKSIZE);
+  memset(buffer, 0, MX_BLOCKSIZE);
+  memcpy(buffer, &mxfs->superblock, sizeof(mx_superblock));
   if(ramdisk_write(disk, buffer, MX_SUPERBLOCK_INDEX) != 0){
     return -1;
   }
@@ -37,7 +44,7 @@ RSTATUS mxfs_refersh_superblock(mxfs* mxfs, ramdisk* disk){
   if(ramdisk_read(disk, buffer, MX_SUPERBLOCK_INDEX) != 0){
     return -1;
   }
-  memcpy(&mxfs->superblock, buffer, MX_BLOCKSIZE);
+  memcpy(&mxfs->superblock, buffer, sizeof(mx_superblock));
   return 0;
 }
 
