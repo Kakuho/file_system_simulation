@@ -1,8 +1,10 @@
 A file system inspired by the minix file system
 
 Organisation:
-  * superblock, bitmap for inode, inode area, bitmap for data blocks, data block area
+  * superblock | bitmap for inode | inode zone | bitmap for data blocks | data block zone
   * bit map based inode and data block allocation
   * blocks for inodes and data are separated
+  * zones are areas containing inodes and data blocks respectively
+  * hierarchal file system with directories and files
 
 documentation of the minix file system: https://www.kernel.org/doc/html/v5.18/filesystems/sysv-fs.html
