@@ -15,6 +15,8 @@ RSTATUS mxfs_block_bitmap_init(mxfs* mxfs, ramdisk* disk, uint16_t base, uint64_
 RSTATUS mxfs_block_bitmap_setup_memory(ramdisk* disk, uint16_t base, uint64_t nblocks);
 RSTATUS mxfs_block_bitmap_register(mxfs* mxfs, uint16_t base, uint64_t nblocks);
 
+RSTATUS mxfs_block_bitmap_poison(mxfs* mxfs, ramdisk* disk, char ch);
+
 size_t mxfs_block_bitmap_nblocks(mxfs* mxfs);
 
 int64_t mxfs_block_bitmap_get_free_index(ramdisk* disk, mxfs* mxfs);

@@ -14,6 +14,8 @@ RSTATUS mxfs_inode_bitmap_init(mxfs* mxfs, ramdisk* disk, uint16_t base, uint64_
 RSTATUS mxfs_inode_bitmap_setup_memory(ramdisk* disk, uint16_t base, uint64_t ninodes);
 RSTATUS mxfs_inode_bitmap_register(mxfs* mxfs, uint16_t base, uint64_t ninodes);
 
+RSTATUS mxfs_inode_bitmap_poison(mxfs* mxfs, ramdisk* disk, char ch);
+
 size_t mxfs_inode_bitmap_nblocks(mxfs* mxfs);
 
 void mxfs_inode_bitmap_index_to_byte_offset(

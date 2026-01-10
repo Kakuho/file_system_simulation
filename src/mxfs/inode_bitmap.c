@@ -30,6 +30,7 @@ RSTATUS mxfs_inode_bitmap_setup_memory(ramdisk* disk, uint16_t base, uint64_t ni
     }
   }
   return 0;
+
 }
 
 RSTATUS mxfs_inode_bitmap_register(mxfs* mxfs, uint16_t base, uint64_t ninodes){
@@ -43,6 +44,28 @@ RSTATUS mxfs_inode_bitmap_register(mxfs* mxfs, uint16_t base, uint64_t ninodes){
   // bitmap_base_index + bitmap_blocks
   size_t blocks = mxfs_inode_bitmap_nblocks(mxfs);
   mxfs->superblock.inode_base = base + blocks;
+  return 0;
+}
+
+RSTATUS mxfs_inode_bitmap_poison(mxfs* mxfs, ramdisk* disk, char ch){
+  if(mxfs == NULL | disk == NULL){
+    return -1;
+  }
+  if(disk->blocksize != MX_BLOCKSIZE){
+    return -1;
+  }
+  // initialising the bitmap onto the disk
+  unsigned ibitmap_base = mxfs->superblock.inode_bitmap_base;
+  size_t blocks = mxfs_inode_bitmap_nblocks(mxfs);
+  char block_buffer[MX_BLOCKSIZE];
+  memset(block_buffer, ch, MX_BLOCKSIZE);
+  // write the bitmap data to the 
+  unsigned i = 0;
+  for(i = 0; i < blocks; i++){ 
+    if(ramdisk_write(disk, block_buffer, ibitmap_base + i) == -1){
+      return -1;
+    }
+  }
   return 0;
 }
 
