@@ -137,3 +137,43 @@ RSTATUS mxfs_read_superblock(ramdisk* disk, char* buffer){
   }
   return 0;
 }
+
+RSTATUS mxfs_set_inode(mxfs* mxfs, ramdisk* disk, uint64_t index, mx_disk_inode* inode){
+  if(mxfs_inode_bitmap_set(disk, &mxfs->superblock, index) != 0){
+    return -1;
+  }
+  if(mxfs_inode_zone_set_inode(mxfs, disk, index, inode) != 0){
+    return -1;
+  }
+  return 0;
+}
+
+RSTATUS mxfs_clear_inode(mxfs* mxfs, ramdisk* disk, uint64_t index){
+  if(mxfs_inode_bitmap_clear(disk, &mxfs->superblock, index) != 0){
+    return -1;
+  }
+  if(mxfs_inode_zone_clear_inode(mxfs, disk, index) != 0){
+    return -1;
+  }
+  return 0;
+}
+
+RSTATUS mxfs_set_block(mxfs* mxfs, ramdisk* disk, uint64_t index, char* buffer){
+  if(mxfs_block_bitmap_set(disk, mxfs, index) != 0){
+    return -1;
+  }
+  if(mxfs_block_zone_set_block(mxfs, disk, index, buffer) != 0){
+    return -1;
+  }
+  return 0;
+}
+
+RSTATUS mxfs_clear_block(mxfs* mxfs, ramdisk* disk, uint64_t index){
+  if(mxfs_block_bitmap_clear(disk, mxfs, index) != 0){
+    return -1;
+  }
+  if(mxfs_block_zone_clear_block(mxfs, disk, index) != 0){
+    return -1;
+  }
+  return 0;
+}
