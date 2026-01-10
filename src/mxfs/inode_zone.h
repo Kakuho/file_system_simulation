@@ -1,6 +1,8 @@
 #ifndef INODE_ZONE_H
 #define INODE_ZONE_H
 
+#include <assert.h>
+
 #include "types.h"
 #include "mxfs.h"
 #include "ramdisk.h"

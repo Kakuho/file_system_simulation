@@ -54,17 +54,27 @@ RSTATUS mxfs_inode_bitmap_poison(mxfs* mxfs, ramdisk* disk, char ch){
   if(disk->blocksize != MX_BLOCKSIZE){
     return -1;
   }
-  // initialising the bitmap onto the disk
+  // initialising the inode blocks of the disk
   unsigned ibitmap_base = mxfs->superblock.inode_bitmap_base;
-  size_t blocks = mxfs_inode_bitmap_nblocks(mxfs);
+  size_t byte_count = mxfs->superblock.ninodes/8 + 1;  // what about alignment bro
+  unsigned block_index = ibitmap_base;
   char block_buffer[MX_BLOCKSIZE];
-  memset(block_buffer, ch, MX_BLOCKSIZE);
-  // write the bitmap data to the 
-  unsigned i = 0;
-  for(i = 0; i < blocks; i++){ 
-    if(ramdisk_write(disk, block_buffer, ibitmap_base + i) == -1){
+  memset(block_buffer, 0, MX_BLOCKSIZE);
+  while(byte_count > 0){
+    // would it be better to read the disk block in first and then perform the poisoning?
+    if(byte_count > MX_BLOCKSIZE){
+      memset(block_buffer, ch, MX_BLOCKSIZE);
+      byte_count -= MX_BLOCKSIZE;
+    }
+    else{
+      memset(block_buffer, ch, byte_count);
+      byte_count -= byte_count;
+    }
+    if(ramdisk_write(disk, block_buffer, block_index) == -1){
       return -1;
     }
+    block_index++;
+    memset(block_buffer, 0, MX_BLOCKSIZE);
   }
   return 0;
 }
@@ -75,7 +85,7 @@ size_t mxfs_inode_bitmap_nblocks(mxfs* mxfs){
     return -1;
   }
   size_t bytes = superblock->ninodes / 8;
-  return bytes/MX_BLOCKSIZE;
+  return bytes/MX_BLOCKSIZE + 1;
 }
 
 void mxfs_inode_bitmap_index_to_byte_offset(

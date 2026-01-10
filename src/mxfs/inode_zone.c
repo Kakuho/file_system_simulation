@@ -43,13 +43,26 @@ RSTATUS mxfs_inode_zone_poison(mxfs* mxfs, ramdisk* disk, char ch){
   // initialising the inode blocks of the disk
   size_t nblocks = mxfs_inode_zone_nblocks(mxfs);
   unsigned izone_base = mxfs->superblock.inode_base;
+  size_t byte_count = mxfs->superblock.ninodes * sizeof(mx_disk_inode);  // what about alignment bro
+  printf("size of disk inode %lu\n", sizeof(mx_disk_inode));
+  printf("total bytes of inode zone %lu\n", byte_count);
+  unsigned block_index = izone_base;
   char block_buffer[MX_BLOCKSIZE];
-  memset(block_buffer, ch, MX_BLOCKSIZE);
-  unsigned i = 0;
-  for(i = 0; i < nblocks; i++){ 
-    if(ramdisk_write(disk, block_buffer, izone_base + i) == -1){
+  while(byte_count > 0){
+    // would it be better to read the disk block in first and then perform the poisoning?
+    if(byte_count > MX_BLOCKSIZE){
+      memset(block_buffer, ch, MX_BLOCKSIZE);
+      byte_count -= MX_BLOCKSIZE;
+    }
+    else{
+      memset(block_buffer, ch, byte_count);
+      byte_count -= byte_count;
+    }
+    if(ramdisk_write(disk, block_buffer, block_index) == -1){
       return -1;
     }
+    block_index++;
+    memset(block_buffer, 0, MX_BLOCKSIZE);  
   }
   return 0;
 }
