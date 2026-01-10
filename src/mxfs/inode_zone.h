@@ -1,5 +1,5 @@
-#ifndef INODE_ZONE_H
-#define INODE_ZONE_H
+#ifndef MXFS_INODE_ZONE_H
+#define MXFS_INODE_ZONE_H
 
 #include <assert.h>
 
