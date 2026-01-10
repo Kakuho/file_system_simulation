@@ -14,7 +14,6 @@ RSTATUS mxfs_block_bitmap_init(mxfs* mxfs, ramdisk* disk, uint16_t base, uint64_
 RSTATUS mxfs_block_bitmap_setup_memory(ramdisk* disk, uint16_t base, uint64_t nblocks){
   uint32_t bytes = nblocks/8; // 1 block = 1 bit
   uint32_t blocks = bytes/MX_BLOCKSIZE;
-
   char buffer[MX_BLOCKSIZE];
   memset(buffer, 0, MX_BLOCKSIZE);
   int i;
@@ -35,8 +34,8 @@ RSTATUS mxfs_block_bitmap_register(mxfs* mxfs, uint16_t base, uint64_t nblocks){
   mxfs->superblock.block_bitmap_base = base;
   mxfs->superblock.blocks_used = 0;
   // bitmap_base_index + bitmap_blocks
-  uint32_t bytes = nblocks/8; 
-  uint32_t blocks = bytes/MX_BLOCKSIZE;
+  uint32_t bytes = nblocks/8 + 1; 
+  uint32_t blocks = bytes/MX_BLOCKSIZE + 1;
   mxfs->superblock.block_base = base + blocks;
   return 0;
 }
