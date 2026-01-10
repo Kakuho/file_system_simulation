@@ -48,7 +48,6 @@ RSTATUS mxfs_block_bitmap_poison(mxfs* mxfs, ramdisk* disk, char ch){
   if(disk->blocksize != MX_BLOCKSIZE){
     return -1;
   }
-  // initialising the inode blocks of the disk
   unsigned dbitmap_base = mxfs->superblock.block_bitmap_base;
   size_t byte_count = mxfs->superblock.nblocks/8 + 1;
   unsigned block_index = dbitmap_base;
@@ -175,6 +174,6 @@ void mxfs_block_bitmap_deallocate(ramdisk* disk, mxfs* mxfs, int64_t index){
   mx_superblock* superblock = (mx_superblock*)sb_buffer;
   mxfs_block_bitmap_clear(disk, mxfs, index);
   // finally update the super block
-  superblock->blocks_used = superblock->inodes_used-1;
+  superblock->blocks_used = superblock->blocks_used-1;
   ramdisk_write(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
 }

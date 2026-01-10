@@ -10,7 +10,6 @@
 
 #include "mxfs.h"
 
-
 RSTATUS mxfs_block_bitmap_init(mxfs* mxfs, ramdisk* disk, uint16_t base, uint64_t nblocks);
 RSTATUS mxfs_block_bitmap_setup_memory(ramdisk* disk, uint16_t base, uint64_t nblocks);
 RSTATUS mxfs_block_bitmap_register(mxfs* mxfs, uint16_t base, uint64_t nblocks);
