@@ -12,11 +12,19 @@ typedef struct mxfs{
 } mxfs;
 
 void mxfs_init(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t nblocks);
+// initially root directory should look like:
+//    /
+//      a.txt       1, a.txt
+//      b.txt       2, b.txt
+//      c.txt       3, c.txt
+RSTATUS mxfs_init_root_directory(mxfs* mxfs, ramdisk* disk);
 
 RSTATUS mxfs_flush_superblock(mxfs* mxfs, ramdisk* disk);
 RSTATUS mxfs_refresh_superblock(mxfs* mxfs, ramdisk* disk);
 
 RSTATUS mxfs_write_superblock(ramdisk* disk, char* buffer);
 RSTATUS mxfs_read_superblock(ramdisk* disk, char* buffer);
+
+
 
 #endif
