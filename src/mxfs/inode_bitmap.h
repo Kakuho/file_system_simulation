@@ -10,8 +10,6 @@
 
 #include "mxfs.h"
 
-
-
 RSTATUS mxfs_inode_bitmap_init(mxfs* mxfs, ramdisk* disk, uint16_t base, uint64_t ninodes);
 RSTATUS mxfs_inode_bitmap_setup_memory(ramdisk* disk, uint16_t base, uint64_t ninodes);
 RSTATUS mxfs_inode_bitmap_register(mxfs* mxfs, uint16_t base, uint64_t ninodes);
