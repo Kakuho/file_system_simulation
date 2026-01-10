@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/ka/C/projects/file_system_simulation/mxfs/build",
-  "command": "/usr/bin/cc  -I/home/ka/C/projects/file_system_simulation/mxfs/src -g -std=gnu90 -o CMakeFiles/file_system_simulation.dir/src/main.c.o -c /home/ka/C/projects/file_system_simulation/mxfs/src/main.c",
-  "file": "/home/ka/C/projects/file_system_simulation/mxfs/src/main.c"
-}
-]
