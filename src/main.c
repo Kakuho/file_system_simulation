@@ -1,6 +1,12 @@
+#include <assert.h>
+
 #include "ramdisk.h"
 #include "mxfs/mxfs.h"
-#include "assert.h"
+#include "mxfs/inode_bitmap.h"
+#include "mxfs/block_bitmap.h"
+#include "mxfs/inode_zone.h"
+#include "mxfs/block_zone.h"
+
 
 void sample_ramdisk_10(){
   ramdisk* disk = ramdisk_create(5, 10);
@@ -18,6 +24,7 @@ void sample_ramdisk_10(){
   printf("Successful Write\n");
   ramdisk_print_properties(disk);
   ramdisk_print(disk);
+
 
   ramdisk_destroy(disk);
 }
@@ -46,8 +53,35 @@ void sample_mxfs_inode_bitmap(){
   ramdisk_print_block(disk, 1);
   assert(sp->ninodes == 100);
   assert(sp->inodes_used == 16);
+  ramdisk_destroy(disk);
+}
+
+void sample_poison_mxfs(){
+  mxfs mxfs;
+  ramdisk* disk = ramdisk_create(140, 1024);
+  if(disk == NULL){
+    return;
+  }
+  mxfs_init(&mxfs, disk, 100, 100);
+  mxfs_inode_bitmap_poison(&mxfs, disk, 0x88);
+  mxfs_inode_zone_poison(&mxfs, disk, 0xBB);
+  mxfs_block_bitmap_poison(&mxfs, disk, 0xFE);
+  mxfs_block_zone_poison(&mxfs, disk, 0x24);
+  ramdisk_dump(disk, "dump.txt");
+  ramdisk_destroy(disk);
+}
+
+void sample_init_mxfs(){
+  mxfs mxfs;
+  ramdisk* disk = ramdisk_create(140, 1024);
+  if(disk == NULL){
+    return;
+  }
+  mxfs_init(&mxfs, disk, 100, 100);
+  ramdisk_dump(disk, "dump.txt");
+  ramdisk_destroy(disk);
 }
 
 int main(){
-  sample_mxfs_inode_bitmap();
+  sample_init_mxfs();
 }

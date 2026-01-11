@@ -1,9 +1,9 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
-#include "merofs.h"
+#include "mxfs/mxfs.h"
 
-mnode* lookup_pn(){
+mx_disk_inode* lookup_pn(){
 
 }
 
