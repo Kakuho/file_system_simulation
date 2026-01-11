@@ -9,6 +9,9 @@
 
 #define MX_SUPERBLOCK_INDEX 1
 
+#define MX_INODE_FILE 0
+#define MX_INODE_DIR  1
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -29,13 +32,19 @@ typedef struct mx_superblock{
 
 typedef struct mx_disk_inode{
   uint16_t mode;
-  size_t size;
-  uintptr_t blocks[MX_INODE_INDIRECT_ENTRIES];
+  uint64_t size;
+  uint64_t blocks[MX_INODE_INDIRECT_ENTRIES];
 } mx_disk_inode;
 
 typedef struct mx_data_block{
   uint8_t data[MX_BLOCKSIZE];
 } mx_data_block;
+
+typedef struct mx_dirent{
+  // should be a integer to represent the inode
+  uint16_t inode_num;
+  char name[8];
+} mx_dirent;
 
 // should be a compile time function / constant
 inline unsigned mx_inodes_per_block(){ return MX_BLOCKSIZE/sizeof(mx_disk_inode); }
