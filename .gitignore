@@ -1,6 +1,7 @@
 build/*
 main
 *.swp
+*.swo
 compile_commands.json
 .cache
 examples/
