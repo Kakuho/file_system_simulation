@@ -25,6 +25,7 @@ RSTATUS mxfs_refresh_superblock(mxfs* mxfs, ramdisk* disk);
 RSTATUS mxfs_write_superblock(ramdisk* disk, char* buffer);
 RSTATUS mxfs_read_superblock(ramdisk* disk, char* buffer);
 
+RSTATUS mxfs_get_inode(mxfs* mxfs, ramdisk* disk, uint64_t index, mx_disk_inode* buffer);
 RSTATUS mxfs_set_inode(mxfs* mxfs, ramdisk* disk, uint64_t index, mx_disk_inode* inode);
 RSTATUS mxfs_clear_inode(mxfs* mxfs, ramdisk* disk, uint64_t index);
 

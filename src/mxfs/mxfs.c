@@ -45,6 +45,10 @@ void mxfs_init(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t nblocks){
     // ABORT!!
     return;
   }
+  if(mxfs_init_root_directory(mxfs, disk) != 0){
+    return;
+  }
+  return;
 }
 
 RSTATUS mxfs_init_root_directory_v1(mxfs* mxfs, ramdisk* disk){
@@ -85,7 +89,88 @@ RSTATUS mxfs_init_root_directory_v1(mxfs* mxfs, ramdisk* disk){
   #define A_BLOCK 1
   #define B_BLOCK 2
   #define C_BLOCK 3
-  // function to implement initialisation
+  // initialise the root directory
+  char buffer[MX_BLOCKSIZE];
+  memset(buffer, 0, MX_BLOCKSIZE);
+
+  mx_disk_inode root_inode;
+  memset(&root_inode, 0, sizeof(mx_disk_inode));
+  root_inode.mode = MX_INODE_DIR;
+  root_inode.size = MX_BLOCKSIZE;
+  root_inode.blocks[0] = ROOT_BLOCK;
+
+  mx_dirent* entries = (mx_dirent*)&buffer;
+  entries[0].inode_num = A_INODE;
+  memcpy(entries[0].name, "a.txt", 6);
+  entries[1].inode_num = B_INODE;
+  memcpy(entries[1].name, "b.txt", 6);
+  entries[2].inode_num = C_INODE;
+  memcpy(entries[2].name, "c.txt", 6);
+
+  assert(mxfs_set_inode(mxfs, disk, 0, &root_inode) == 0);
+  assert(mxfs_set_block(mxfs, disk, 0, buffer) == 0);
+
+  assert(mxfs_get_inode(mxfs, disk, 0, &root_inode) == 0);
+  assert(root_inode.mode == MX_INODE_DIR);
+  assert(root_inode.size == MX_BLOCKSIZE);
+  assert(root_inode.blocks[0] == ROOT_BLOCK);
+
+  // a.txt initialisation
+
+  mx_disk_inode a_inode;
+  memset(&a_inode, 0, sizeof(mx_disk_inode));
+  a_inode.mode = MX_INODE_FILE;
+  a_inode.size = MX_BLOCKSIZE;
+  a_inode.blocks[0] = A_BLOCK;
+
+  memset(&buffer, 0, MX_BLOCKSIZE);
+  memcpy(&buffer, "this is a.txt", 14);
+
+  assert(mxfs_set_inode(mxfs, disk, A_INODE, &a_inode) == 0);
+  assert(mxfs_set_block(mxfs, disk, A_BLOCK, buffer) == 0);
+
+  assert(mxfs_get_inode(mxfs, disk, A_INODE, &a_inode) == 0);
+  assert(a_inode.mode == MX_INODE_FILE);
+  assert(a_inode.size == MX_BLOCKSIZE);
+  assert(a_inode.blocks[0] == A_BLOCK);
+
+  // b.txt initialisation
+
+  mx_disk_inode b_inode;
+  memset(&b_inode, 0, sizeof(mx_disk_inode));
+  b_inode.mode = MX_INODE_FILE;
+  b_inode.size = MX_BLOCKSIZE;
+  b_inode.blocks[0] = B_BLOCK;
+
+  memset(&buffer, 0, MX_BLOCKSIZE);
+  memcpy(&buffer, "this is b.txt bye bye", 23);
+
+  assert(mxfs_set_inode(mxfs, disk, B_INODE, &b_inode) == 0);
+  assert(mxfs_set_block(mxfs, disk, B_BLOCK, buffer) == 0);
+
+  assert(mxfs_get_inode(mxfs, disk, B_INODE, &b_inode) == 0);
+  assert(b_inode.mode == MX_INODE_FILE);
+  assert(b_inode.size == MX_BLOCKSIZE);
+  assert(b_inode.blocks[0] == B_BLOCK);
+
+  // c.txt initialisation
+
+  mx_disk_inode c_inode;
+  memset(&c_inode, 0, sizeof(mx_disk_inode));
+  c_inode.mode = MX_INODE_FILE;
+  c_inode.size = MX_BLOCKSIZE;
+  c_inode.blocks[0] = C_BLOCK;
+
+  memset(&buffer, 0, MX_BLOCKSIZE);
+  memcpy(&buffer, "see you c.txt", 14);
+
+  assert(mxfs_set_inode(mxfs, disk, C_INODE, &c_inode) == 0);
+  assert(mxfs_set_block(mxfs, disk, C_BLOCK, buffer) == 0);
+
+  assert(mxfs_get_inode(mxfs, disk, C_INODE, &c_inode) == 0);
+  assert(c_inode.mode == MX_INODE_FILE);
+  assert(c_inode.size == MX_BLOCKSIZE);
+  assert(c_inode.blocks[0] == C_BLOCK);
 
   #undef ROOT_INODE 
   #undef A_INODE 
@@ -95,6 +180,7 @@ RSTATUS mxfs_init_root_directory_v1(mxfs* mxfs, ramdisk* disk){
   #undef A_BLOCK 
   #undef B_BLOCK 
   #undef C_BLOCK 
+
   return 0;
 }
 
@@ -133,6 +219,13 @@ RSTATUS mxfs_write_superblock(ramdisk* disk, char* buffer){
 
 RSTATUS mxfs_read_superblock(ramdisk* disk, char* buffer){
   if(ramdisk_read(disk, buffer, MX_SUPERBLOCK_INDEX) != 0){
+    return -1;
+  }
+  return 0;
+}
+
+RSTATUS mxfs_get_inode(mxfs* mxfs, ramdisk* disk, uint64_t index, mx_disk_inode* buffer){
+  if(mxfs_inode_zone_get_inode(mxfs, disk, index, buffer) != 0){
     return -1;
   }
   return 0;
