@@ -90,6 +90,28 @@ void mxfs_inode_zone_index_to_block_offset(
   uint64_t global_byte_offset = inode_index * sizeof(mx_disk_inode);
   *block_index = global_byte_offset/MX_BLOCKSIZE;
   *offset = global_byte_offset - *block_index * MX_BLOCKSIZE;
+  *block_index += mxfs->superblock.inode_base;
+  printf("block index: %u\n", *block_index);
+  printf("offset: %u", *offset);
+}
+
+int64_t mxfs_inode_zone_get_inode(
+  mxfs* mxfs,
+  ramdisk* disk, 
+  uint64_t index, 
+  mx_disk_inode* inode
+){
+  assert(index < mxfs->superblock.ninodes);
+  uint32_t blockindex;
+  uint8_t offset;
+  mxfs_inode_zone_index_to_block_offset(mxfs, index, &blockindex, &offset);
+  char buffer[MX_BLOCKSIZE];
+  if(ramdisk_read(disk, buffer, blockindex) != 0){
+    return -1;
+  }
+  // now we can perform the init, simply perform a copy of the memory
+  memcpy(inode, &buffer[offset], sizeof(mx_disk_inode));
+  return 0;
 }
 
 int64_t mxfs_inode_zone_set_inode(
