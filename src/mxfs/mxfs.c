@@ -271,6 +271,26 @@ RSTATUS mxfs_clear_block(mxfs* mxfs, ramdisk* disk, uint64_t index){
   return 0;
 }
 
+static RSTATUS search_directory(mxfs* mxfs, ramdisk* disk, uint64_t inode_index, char* string){
+  // search the directory to see if it contains the string as an entry
+  mx_disk_inode working_inode;
+  mxfs_get_inode(mxfs, disk, inode_index, &working_inode);
+  char buffer[MX_BLOCKSIZE];
+  if(ramdisk_read(disk, buffer, working_inode.blocks[0]) != 0){
+    return -1;
+  }
+  // now we can finally loop through the disk block
+  mx_dirent* entries = (mx_dirent*)buffer;
+  uint32_t index = 0;
+  while(index < MX_BLOCKSIZE / sizeof(mx_dirent)){
+    if(entries[index].name == string){
+      return 0;
+    }
+    index++;
+  }
+  return -1;
+}
+
 //  example paths:
 //    .
 //    a.txt
