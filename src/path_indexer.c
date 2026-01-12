@@ -67,11 +67,19 @@ RSTATUS path_indexer_parse(path_indexer* path_indexer, const char* path){
   return 0;
 }
 
-RSTATUS path_indexer_read_component(path_indexer* path_indexer, unsigned index, char* buffer){
+RSTATUS path_indexer_read_component(path_indexer* path_indexer, unsigned index, char* buffer, int32_t* length){
   assert(index < path_indexer->ncomponents);
   int32_t start = path_indexer->entries[index].start;
   int32_t end = path_indexer->entries[index].end;
-  memcpy(buffer, &path_indexer->path[start], end - start);
+  *length = end - start;
+  if(path_indexer->path[end] == '/'){
+    memcpy(buffer, &path_indexer->path[start], end - start);
+  }
+  else{
+    memcpy(buffer, &path_indexer->path[start], end - start + 1);
+    *length += 1;
+  }
+  printf("length: %d\n", *length);
   return 0;
 }
 

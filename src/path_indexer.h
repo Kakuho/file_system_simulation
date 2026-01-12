@@ -22,7 +22,7 @@ typedef struct path_indexer{
 } path_indexer;     
 
 RSTATUS path_indexer_parse(path_indexer* path_indexer, const char* path);
-RSTATUS path_indexer_read_component(path_indexer* path_indexer, unsigned index, char* buffer);
+RSTATUS path_indexer_read_component(path_indexer* path_indexer, unsigned index, char* buffer, int32_t* length);
 
 RSTATUS path_indexer_print(path_indexer* path_indexer);
 RSTATUS path_indexer_print_indicies(path_indexer* path_indexer);
