@@ -12,6 +12,11 @@ typedef struct mxfs{
   mx_superblock superblock;
 } mxfs;
 
+typedef struct component_buffer{
+  char buffer[100];
+  int32_t length;
+} component_buffer;
+
 void mxfs_init(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t nblocks);
 // initially root directory should look like:
 //    /
@@ -33,6 +38,10 @@ RSTATUS mxfs_clear_inode(mxfs* mxfs, ramdisk* disk, uint64_t index);
 RSTATUS mxfs_set_block(mxfs* mxfs, ramdisk* disk, uint64_t index, char* buffer);
 RSTATUS mxfs_clear_block(mxfs* mxfs, ramdisk* disk, uint64_t index);
 
+RSTATUS mxfs_read_inode_block(
+  mxfs* mxfs, ramdisk* disk, mx_disk_inode* inode, uint64_t blockno, char* buffer);
+
+int32_t mxfs_dirent_to_inode(mxfs* mxfs, ramdisk* disk, uint64_t dir_index, component_buffer* buffer);
 int32_t mxfs_path_to_inode(mxfs* mxfs, ramdisk* disk, const char* path);
 
 #endif
