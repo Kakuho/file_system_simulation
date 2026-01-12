@@ -30,7 +30,8 @@ typedef struct mx_superblock{
   uint16_t block_base;
 } mx_superblock;
 
-typedef struct mx_disk_inode{
+
+typedef struct __attribute__((packed)) mx_disk_inode{
   uint16_t mode;
   uint64_t size;
   uint64_t blocks[MX_INODE_INDIRECT_ENTRIES];
@@ -40,7 +41,7 @@ typedef struct mx_data_block{
   uint8_t data[MX_BLOCKSIZE];
 } mx_data_block;
 
-typedef struct mx_dirent{
+typedef struct __attribute__((packed)) mx_dirent{
   // should be a integer to represent the inode
   uint16_t inode_num;
   char name[8];
