@@ -72,7 +72,11 @@ RSTATUS path_indexer_read_component(path_indexer* path_indexer, unsigned index, 
   int32_t start = path_indexer->entries[index].start;
   int32_t end = path_indexer->entries[index].end;
   *length = end - start;
-  if(path_indexer->path[end] == '/'){
+  if(*length == 0){
+    memcpy(buffer, &path_indexer->path[start], 1);
+    *length = 1;
+  }
+  else if(path_indexer->path[end] == '/'){
     memcpy(buffer, &path_indexer->path[start], end - start);
   }
   else{
