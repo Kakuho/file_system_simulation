@@ -270,3 +270,36 @@ RSTATUS mxfs_clear_block(mxfs* mxfs, ramdisk* disk, uint64_t index){
   }
   return 0;
 }
+
+//  example paths:
+//    .
+//    a.txt
+//    yaya/b.txt
+//
+//    /
+//    /a.txt
+//    /yaya/b.txt
+//  for now it will assume absolute paths
+int32_t mxfs_path_to_inode(mxfs* mxfs, ramdisk* disk, const char* path){
+  path_indexer pidx;
+  path_indexer_parse(&pidx, path);
+  mx_disk_inode working_inode;
+
+  char component_buffer[100];
+  int32_t length;
+  uint32_t index = 0;
+  path_indexer_read_component(&pidx, 0, component_buffer, &length);
+  assert(component_buffer[0] == '/');
+  mxfs_get_inode(mxfs, disk, 0, &working_inode);
+
+  assert(working_inode.mode == MX_INODE_DIR);
+  index++;
+  while(index < pidx.ncomponents){
+    path_indexer_read_component(&pidx, index, component_buffer, &length);
+    if(working_inode.mode != MX_INODE_DIR){
+      return -1;
+    }
+    mxfs_get_inode(mxfs, disk, 0, &working_inode);
+    index++;
+  }
+}

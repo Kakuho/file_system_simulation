@@ -4,6 +4,7 @@
 #include "ramdisk.h"
 #include "bitmap.h"
 #include "types.h"
+#include "path_indexer.h"
 
 typedef struct mxfs{
   mx_bitmap inode_bitmap;
@@ -31,5 +32,7 @@ RSTATUS mxfs_clear_inode(mxfs* mxfs, ramdisk* disk, uint64_t index);
 
 RSTATUS mxfs_set_block(mxfs* mxfs, ramdisk* disk, uint64_t index, char* buffer);
 RSTATUS mxfs_clear_block(mxfs* mxfs, ramdisk* disk, uint64_t index);
+
+int32_t mxfs_path_to_inode(mxfs* mxfs, ramdisk* disk, const char* path);
 
 #endif
