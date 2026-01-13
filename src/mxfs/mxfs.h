@@ -44,4 +44,6 @@ RSTATUS mxfs_read_inode_block(
 int32_t mxfs_dirent_to_inode(mxfs* mxfs, ramdisk* disk, uint64_t dir_index, component_buffer* buffer);
 int32_t mxfs_path_to_inode(mxfs* mxfs, ramdisk* disk, const char* path);
 
+void mxfs_print_tree(mxfs* mxfs, ramdisk* disk);
+
 #endif

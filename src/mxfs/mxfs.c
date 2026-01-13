@@ -281,10 +281,10 @@ static RSTATUS search_directory(
 ){
   // search the directory to see if it contains the string as an entry
   mx_disk_inode working_inode;
-  printf("\ninput inode: %ld\n", *inode_index);
+  //printf("\ninput inode: %ld\n", *inode_index);
   assert(mxfs_get_inode(mxfs, disk, *inode_index, &working_inode) == 0);
   char buffer[MX_BLOCKSIZE];
-  printf("working inode block 0: %ld", working_inode.blocks[0]);
+  //printf("working inode block 0: %ld", working_inode.blocks[0]);
   assert(working_inode.blocks[0] == 0);
   if(ramdisk_read(disk, buffer, working_inode.blocks[0] + mxfs->superblock.block_base) != 0){
     return -1;
@@ -357,4 +357,108 @@ int32_t mxfs_path_to_inode(mxfs* mxfs, ramdisk* disk, const char* path){
     index++;
   }
   return inode_num;
+}
+
+static void print_file(
+  mxfs* mxfs,
+  ramdisk* disk,
+  char* parent_buffer,
+  uint32_t parent_length,
+  char* component
+){
+  uint32_t comp_length = strlen(component);
+  char path[100];
+  memcpy(path, parent_buffer, parent_length);
+  memcpy(&path[parent_length], component, comp_length);
+  path[99] = '\0';
+  printf("%s\n", path);
+}
+
+static void print_subdirectory(
+  mxfs* mxfs, 
+  ramdisk* disk, 
+  uint32_t inode_num, 
+  char* path, 
+  uint32_t length
+){
+  mx_disk_inode working_inode;
+  char block_buffer[MX_BLOCKSIZE];
+
+  assert(mxfs_get_inode(mxfs, disk, inode_num, &working_inode) == 0);
+  assert(working_inode.mode == MX_INODE_DIR);
+
+  if(ramdisk_read(disk, block_buffer, working_inode.blocks[0] + mxfs->superblock.block_base) != 0){
+   return;
+  }
+
+  uint32_t index = 0;
+  mx_dirent* entries = (mx_dirent*)block_buffer;
+  while(index < MX_BLOCKSIZE/sizeof(mx_dirent)){
+    uint32_t inode_num = entries[index].inode_num;
+    length += strlen(entries[index].name);
+    if(inode_num != 0){
+      mxfs_get_inode(mxfs, disk, inode_num, &working_inode);
+      if(working_inode.mode == MX_INODE_FILE){
+        print_file(mxfs, disk, path, length, entries[index].name);
+      }
+      else if(working_inode.mode == MX_INODE_DIR){
+        print_subdirectory(mxfs, disk, inode_num, path, length);
+      }
+      else{
+        assert((working_inode.mode == MX_INODE_DIR) || (working_inode.mode == MX_INODE_FILE));
+      }
+    }
+    index++;
+  }
+}
+
+void mxfs_print_tree(mxfs* mxfs, ramdisk* disk){
+  //  print ordrer:
+  //  /
+  //  /yaya
+  //  /yaya/a.txt
+  //  /yaya/b.txt
+  //  /yaya/b.txt
+  //  /babaisyou
+  //  /babaisyou/a.txt
+  //  /babaisyou/b.txt
+  //  /babaisyou/c.txt
+  //
+  //  read the root directory into ram
+  //  go through the root directory and for each entry:
+  //    if it is a directory
+  //      read the directory into ram
+  mx_disk_inode working_inode;
+  char block_buffer[MX_BLOCKSIZE];
+  char path_buffer[100];
+  uint32_t length = 1;
+  memset(path_buffer, 0, 100);
+  path_buffer[0] = '/';
+  printf("%s\n", path_buffer);
+
+  mxfs_get_inode(mxfs, disk, 0, &working_inode);
+  assert(working_inode.mode == MX_INODE_DIR);
+
+  if(ramdisk_read(disk, block_buffer, working_inode.blocks[0] + mxfs->superblock.block_base) != 0){
+   return;
+  }
+
+  uint32_t index = 0;
+  mx_dirent* entries = (mx_dirent*)block_buffer;
+  while(index < MX_BLOCKSIZE/sizeof(mx_dirent)){
+    uint32_t inode_num = entries[index].inode_num;
+    if(inode_num != 0){
+      mxfs_get_inode(mxfs, disk, inode_num, &working_inode);
+      if(working_inode.mode == MX_INODE_FILE){
+        print_file(mxfs, disk, path_buffer, length, entries[index].name);
+      }
+      else if(working_inode.mode == MX_INODE_DIR){
+        print_subdirectory(mxfs, disk, inode_num, path_buffer, length);
+      }
+      else{
+        assert((working_inode.mode == MX_INODE_DIR) || (working_inode.mode == MX_INODE_FILE));
+      }
+    }
+    index++;
+  }
 }
