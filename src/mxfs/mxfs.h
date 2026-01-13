@@ -47,4 +47,10 @@ int32_t mxfs_path_to_inode(mxfs* mxfs, ramdisk* disk, const char* path);
 
 void mxfs_print_tree(mxfs* mxfs, ramdisk* disk);
 
+void mxfs_create_file_rootdir(mxfs* mxfs, ramdisk* disk, const char* name);
+void mxfs_create_file(mxfs* mxfs, ramdisk* disk, uint32_t pdir_inode, const char* name);
+
+void mxfs_create_dir_rootdir(mxfs* mxfs, ramdisk* disk, const char* name);
+void mxfs_create_dir(mxfs* mxfs, ramdisk* disk, uint32_t pdir_inode, const char* name);
+
 #endif
