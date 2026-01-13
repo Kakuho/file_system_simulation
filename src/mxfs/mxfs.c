@@ -26,15 +26,15 @@ void mxfs_setup_inodes_dblocks(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t
     // ABORT!!
     return;
   }
-  printf("Finished Initialising file system...\n");
-  printf("Inode Bitmap Base Index: %d\n", MX_SUPERBLOCK_INDEX + 1);
-  printf("Inode Bitmap Blocks: %lu\n", mxfs_inode_bitmap_nblocks(mxfs));
-  printf("Inode Zone Base Index: %u\n", mxfs->superblock.inode_base);
-  printf("Inode Zone Blocks: %lu\n", mxfs_inode_zone_nblocks(mxfs));
-  printf("Block Bitmap Base Index: %d\n", mxfs->superblock.block_bitmap_base);
-  printf("Block Bitmap Blocks: %lu\n", mxfs_block_bitmap_nblocks(mxfs));
-  printf("Block Zone Base Index: %u\n", mxfs->superblock.block_base);
-  printf("Block Zone Blocks: %lu\n", mxfs_block_zone_nblocks(mxfs));
+  debug_log("Finished Initialising file system...\n");
+  debug_log("Inode Bitmap Base Index: %d\n", MX_SUPERBLOCK_INDEX + 1);
+  debug_log("Inode Bitmap Blocks: %lu\n", mxfs_inode_bitmap_nblocks(mxfs));
+  debug_log("Inode Zone Base Index: %u\n", mxfs->superblock.inode_base);
+  debug_log("Inode Zone Blocks: %lu\n", mxfs_inode_zone_nblocks(mxfs));
+  debug_log("Block Bitmap Base Index: %d\n", mxfs->superblock.block_bitmap_base);
+  debug_log("Block Bitmap Blocks: %lu\n", mxfs_block_bitmap_nblocks(mxfs));
+  debug_log("Block Zone Base Index: %u\n", mxfs->superblock.block_base);
+  debug_log("Block Zone Blocks: %lu\n", mxfs_block_zone_nblocks(mxfs));
 }
 
 void mxfs_init(mxfs* mxfs, ramdisk* disk, size_t ninodes, size_t nblocks){

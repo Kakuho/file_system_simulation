@@ -87,8 +87,8 @@ void ramdisk_print_properties(ramdisk* disk){
 char* ramdisk_index_to_baddr(ramdisk* disk, unsigned index){
   uintptr_t base = (uintptr_t)(disk->base);
   char* addr = (char*)(base + (index * disk->blocksize));
-  printf("base: %x\n", base);
-  printf("addr: %x\n", addr);
+  debug_log("base: %x\n", base);
+  debug_log("addr: %x\n", addr);
   return addr;
 }
 

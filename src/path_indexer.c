@@ -20,12 +20,12 @@ RSTATUS path_indexer_parse(path_indexer* path_indexer, const char* path){
   //  /hiya/baka/         - start = 6 end = 10
   size_t index = 0;
   size_t path_length = strlen(path);
-  printf("path length: %lu\n", path_length);
+  debug_log("path length: %lu\n", path_length);
   path_indexer->ncomponents = 0;
   path_indexer->path = path;
 
   if(path[0] == '/'){
-    printf("Absolute Path");
+    debug_log("Absolute Path");
     path_indexer->entries[0].start = 0;
     path_indexer->entries[0].end = 0;
     path_indexer->ncomponents++;
@@ -61,8 +61,8 @@ RSTATUS path_indexer_parse(path_indexer* path_indexer, const char* path){
       path_indexer->ncomponents++;
       index++;
     }
-    printf("component start: %d\n", path_indexer->entries[index-1].start);
-    printf("component end: %d\n", path_indexer->entries[index-1].end);
+    debug_log("component start: %d\n", path_indexer->entries[index-1].start);
+    debug_log("component end: %d\n", path_indexer->entries[index-1].end);
   }
   return 0;
 }
@@ -83,7 +83,7 @@ RSTATUS path_indexer_read_component(path_indexer* path_indexer, unsigned index, 
     memcpy(buffer, &path_indexer->path[start], end - start + 1);
     *length += 1;
   }
-  printf("length: %d\n", *length);
+  debug_log("length: %d\n", *length);
   return 0;
 }
 

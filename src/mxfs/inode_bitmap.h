@@ -7,6 +7,7 @@
 
 #include "types.h"
 #include "ramdisk.h"
+#include "debug/debug_log.h"
 
 #include "mxfs.h"
 

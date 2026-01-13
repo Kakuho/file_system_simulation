@@ -1,5 +1,6 @@
 #include "inode_zone.h"
 
+
 RSTATUS mxfs_inode_zone_init(mxfs* mxfs, ramdisk* disk){
   if(mxfs_inode_zone_setup_memory(mxfs, disk) != 0){
     return -1;
@@ -91,8 +92,8 @@ void mxfs_inode_zone_index_to_block_offset(
   *block_index = global_byte_offset/MX_BLOCKSIZE;
   *offset = global_byte_offset - *block_index * MX_BLOCKSIZE;
   *block_index += mxfs->superblock.inode_base;
-  printf("block index: %u\n", *block_index);
-  printf("offset: %u", *offset);
+  debug_log("block index: %u\n", *block_index);
+  debug_log("offset: %u", *offset);
 }
 
 int64_t mxfs_inode_zone_get_inode(

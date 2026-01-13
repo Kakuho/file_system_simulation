@@ -8,6 +8,7 @@
 #include <assert.h>
 
 #include "types.h"
+#include "debug/debug_log.h"
 
 typedef struct component_indicies{
   // invalid start and ends are marked with -1

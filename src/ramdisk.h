@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include "types.h"
+#include "debug/debug_log.h"
 
 typedef struct ramdisk{
   char* base;

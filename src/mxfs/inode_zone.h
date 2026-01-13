@@ -7,6 +7,8 @@
 #include "mxfs.h"
 #include "ramdisk.h"
 
+#include "debug/debug_log.h"
+
 RSTATUS mxfs_inode_zone_init(mxfs* mxfs, ramdisk* disk);
 RSTATUS mxfs_inode_zone_setup_memory(mxfs* mxfs, ramdisk* disk);
 

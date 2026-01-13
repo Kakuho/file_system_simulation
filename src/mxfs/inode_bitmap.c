@@ -129,8 +129,8 @@ int64_t mxfs_inode_bitmap_set(ramdisk* disk, mx_superblock* superblock, uint64_t
   uint32_t byteno = index / 8;
   uint8_t offset = index - ((index/8) * 8); // probably a better way to do this
   // our index is at offset of the byte byteno
-  printf("byte index: %d\n", byteno);
-  printf("offset: %d\n", offset);
+  debug_log("byte index: %d\n", byteno);
+  debug_log("offset: %d\n", offset);
   buffer[byteno] = buffer[byteno] | (1 << (7 - offset));
   ramdisk_write(disk, buffer, superblock->inode_bitmap_base);
   return 0;
