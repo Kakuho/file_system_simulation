@@ -5,6 +5,7 @@
 #include "bitmap.h"
 #include "types.h"
 #include "path_indexer.h"
+#include "debug/debug_log.h"
 
 typedef struct mxfs{
   mx_bitmap inode_bitmap;
