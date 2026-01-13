@@ -22,12 +22,12 @@ size_t mxfs_inode_bitmap_nblocks(mxfs* mxfs);
 void mxfs_inode_bitmap_index_to_byte_offset(
     uint64_t inode_index, uint32_t* byte_index, uint8_t* offset);
 
-int64_t mxfs_inode_bitmap_get_free_index(char* inode_block, mx_superblock* superblock);
+int64_t mxfs_inode_bitmap_get_free_index(mxfs* mxfs, ramdisk* disk);
 
 int64_t mxfs_inode_bitmap_set(ramdisk* disk, mx_superblock* superblock, uint64_t index);
 int64_t mxfs_inode_bitmap_clear(ramdisk* disk, mx_superblock* superblock, uint64_t index);
 
-void mxfs_inode_bitmap_allocate(ramdisk* disk);
-void mxfs_inode_bitmap_deallocate(ramdisk* disk, int64_t index);
+void mxfs_inode_bitmap_allocate(mxfs* mxfs, ramdisk* disk);
+void mxfs_inode_bitmap_deallocate(mxfs* mxfs, ramdisk* disk, int64_t index);
 
 #endif

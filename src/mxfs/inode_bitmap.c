@@ -97,13 +97,15 @@ void mxfs_inode_bitmap_index_to_byte_offset(
   *offset = inode_index - ((inode_index/8) * 8);
 }
 
-int64_t mxfs_inode_bitmap_get_free_index(char* inode_block, mx_superblock* superblock){
+int64_t mxfs_inode_bitmap_get_free_index(mxfs* mxfs, ramdisk* disk){
   // we know a block is 1024 bytes long, therefore the bitmap is 1024*8 bits long
   // remember 0 as free and 1 as busy
+  char block_buffer[MX_BLOCKSIZE];
+  assert(ramdisk_read(disk, block_buffer, mxfs->superblock.inode_bitmap_base) == 0);
   uint8_t mask = 0xFF;
   int i;
-  for(i = 0; i < superblock->ninodes; i++){
-    uint8_t present_mask = ~(inode_block[i] & mask);  // 0 for busy 1 for free
+  for(i = 0; i < mxfs->superblock.ninodes; i++){
+    uint8_t present_mask = ~(block_buffer[i] & mask);  // 0 for busy 1 for free
     if(present_mask > 0){
       int bitpos = 0;  // counting from the right-most bits of the present_mask
       while(!((present_mask >> bitpos) & 0x01)){
@@ -149,22 +151,20 @@ int64_t mxfs_inode_bitmap_clear(ramdisk* disk, mx_superblock* superblock, uint64
   return 0;
 }
 
-void mxfs_inode_bitmap_allocate(ramdisk* disk){
+void mxfs_inode_bitmap_allocate(mxfs* mxfs, ramdisk* disk){
   // first read the superblock into ram
   char sb_buffer[MX_BLOCKSIZE];
   ramdisk_read(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
   mx_superblock* superblock = (mx_superblock*)sb_buffer;
   // then find a free index from the bitmap and set it
-  char buffer[MX_BLOCKSIZE];
-  ramdisk_read(disk, buffer, superblock->inode_bitmap_base);
-  int64_t index = mxfs_inode_bitmap_get_free_index(buffer, superblock);
+  int64_t index = mxfs_inode_bitmap_get_free_index(mxfs, disk);
   mxfs_inode_bitmap_set(disk, superblock, index); 
   // finally update the super block
   superblock->inodes_used = superblock->inodes_used+1;
   ramdisk_write(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
 }
 
-void mxfs_inode_bitmap_deallocate(ramdisk* disk, int64_t index){
+void mxfs_inode_bitmap_deallocate(mxfs* mxfs, ramdisk* disk, int64_t index){
   // first read the superblock into ram
   char sb_buffer[MX_BLOCKSIZE];
   ramdisk_read(disk, sb_buffer, MX_SUPERBLOCK_INDEX);
