@@ -462,3 +462,46 @@ void mxfs_print_tree(mxfs* mxfs, ramdisk* disk){
     index++;
   }
 }
+
+RSTATUS mxfs_create_file_rootdir(mxfs* mxfs, ramdisk* disk, const char* name){
+  // read the root directory into ram
+  mx_disk_inode root_inode;
+  mxfs_get_inode(mxfs, disk, 0, &root_inode);
+
+  char block_buffer[MX_BLOCKSIZE];
+  if(ramdisk_read(disk, block_buffer, root_inode.blocks[0] + mxfs->superblock.block_base) != 0){
+   return -1;
+  }
+
+  // check to see if there's free space within the directory
+  uint32_t index = 0;
+  mx_dirent* entries = (mx_dirent*)block_buffer;
+  while(index < MX_BLOCKSIZE/sizeof(mx_dirent)){
+    uint32_t inode_num = entries[index].inode_num;
+    if(inode_num == 0){
+      // free space!
+      int64_t inode_num = mxfs_inode_bitmap_get_free_index(mxfs, disk);
+      printf("inode num: %ld\n", inode_num);
+      if(inode_num < 0) return -1;
+      int64_t block_num = mxfs_block_bitmap_get_free_index(disk, mxfs);
+      //printf("block num: %ld\n", block_num);
+      //if(block_num < 0) return -1;
+      // initialise the inode
+      mx_disk_inode file_inode;
+      file_inode.size = 0;
+      file_inode.mode = MX_INODE_FILE;
+      file_inode.blocks[0] = block_num;
+      // update the inode
+      assert(mxfs_set_inode(mxfs, disk, inode_num, &file_inode) == 0);
+      // update the block
+      assert(mxfs_set_block(mxfs, disk, block_num, block_buffer) == 0);
+      // update the root directory
+      entries[index].inode_num = inode_num;
+      memcpy(entries[index].name, name, strlen(name));
+      ramdisk_write(disk, block_buffer, root_inode.blocks[0] + mxfs->superblock.block_base);
+      return 0;
+    }
+    index++;
+  }
+  return -1;
+}
